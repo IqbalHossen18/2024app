@@ -2,10 +2,61 @@ import Head from "next/head";
 import Image from "next/image";
 import { Inter } from "next/font/google";
 import styles from "@/styles/Home.module.css";
+import clientpromise from "../mongodbclients/mongodb.js"
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
+export async function getServerSideProps() {
+  try {
+    await clientpromise;
+    // `await clientPromise` will use the default database passed in the MONGODB_URI
+    // However you can use another database (e.g. myDatabase) by replacing the `await clientPromise` with the following code:
+    //
+    // `const client = await clientPromise`
+    // `const db = client.db("myDatabase")`
+    //
+    // Then you can execute queries against your database like so:
+    // db.find({}) or any of the MongoDB Node Driver commands
+
+    return {
+      props: { isConnected: true },
+    };
+  } catch (e) {
+    console.error(e);
+    return {
+      props: { isConnected: false },
+    };
+  }
+}
+ 
+
+// import clientPromise from "../lib/mongodb";
+// import { getServerSideProps } from "next";
+
+// export const getServerSideProps = async () => {
+//   try {
+//     await clientPromise;
+//     // `await clientPromise` will use the default database passed in the MONGODB_URI
+//     // However you can use another database (e.g. myDatabase) by replacing the `await clientPromise` with the following code:
+//     //
+//     // `const client = await clientPromise`
+//     // `const db = client.db("myDatabase")`
+//     //
+//     // Then you can execute queries against your database like so:
+//     // db.find({}) or any of the MongoDB Node Driver commands
+
+//     return {
+//       props: { isConnected: true },
+//     };
+//   } catch (e) {
+//     console.error(e);
+//     return {
+//       props: { isConnected: false },
+//     };
+//   }
+// };
+
+export default function Home({isConnected}) {
   return (
     <>
       <Head>
@@ -15,6 +66,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={`${styles.main} ${inter.className}`}>
+        {isConnected ? <p>connected to the server</p>: <p>disconnected to the server</p>}
         <div className={styles.description}>
           <p>
             Get started by editing&nbsp;
@@ -112,3 +164,4 @@ export default function Home() {
     </>
   );
 }
+
